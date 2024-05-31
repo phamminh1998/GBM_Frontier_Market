@@ -22,6 +22,10 @@ class GBM_Simulator:
         The ending date in YYYY-MM-DD format.
     output_dir : `str`
         The full path to the output directory for the CSV.
+    T = 1: `int`
+        Time in years
+    n: `int`
+        Number of time steps
     symbol : `str`
         The ticker symbol to use.
     init_price : `float`
@@ -39,6 +43,8 @@ class GBM_Simulator:
         start_date,
         end_date,
         output_dir,
+        T,
+        n,
         symbol,
         init_price,
         mu,
@@ -48,6 +54,8 @@ class GBM_Simulator:
         self.start_date = start_date
         self.end_date = end_date
         self.output_dir = output_dir
+        self.T = T,
+        self.n = n,
         self.symbol = symbol
         self.init_price = init_price
         self.mu = mu
@@ -70,13 +78,14 @@ class GBM_Simulator:
             self.end_date,
             freq='B'
         )
-
+        zeros = pd.Series(np.zeros(len(date_range)))
         return pd.DataFrame(
             {
                 'date': date_range,
-                **{f'path_{i}': np.nan for i in range(1, self.num_sims + 1)}
+                'open': zeros,
+                'close': zeros,
             }
-        )
+        )[['date', 'open', 'close']]
 
     def _create_geometric_brownian_motion(self, data):
         """
@@ -94,18 +103,37 @@ class GBM_Simulator:
         `pd.DataFrame`
             The DataFrame containing the asset price paths.
         """
-        n = len(data)
-        T = n / len(data['date'])
-        dt = T / n
+        T = self.T  # Time in years
+        n = self.n  # Number of time steps
+        dt = T / n  # Time step
 
-        paths = pd.DataFrame(
-            self.init_price * np.exp(
-                np.cumsum((self.mu - 0.5 * self.sigma ** 2) * dt + self.sigma * np.sqrt(dt) * np.random.normal(0, 1, size=(n, self.num_sims)), axis=0)
-            ),
-            columns=[f'path_{i}' for i in range(1, self.num_sims + 1)]
+        # Vectorised implementation of asset path generation
+        asset_path = np.exp(
+            (self.mu - self.sigma**2 / 2) * dt +
+            self.sigma * np.random.normal(0, np.sqrt(dt), size=n)
         )
-        paths['average'] = paths.mean(axis=1)
-        return pd.concat([data[['date']], paths], axis=1)
+
+        # Generate the asset price paths
+        return self.init_price * asset_path.cumprod()
+    
+    def _append_path_to_data(self, data, path):
+        """
+        Append the generated price path to the DataFrame.
+
+        Parameters
+        ----------
+        data : `pd.DataFrame`
+            The DataFrame containing the generated price paths.
+        path : `np.array`
+            The generated price path to append to the DataFrame.
+
+        Returns
+        -------
+        `pd.DataFrame`
+            The DataFrame containing the appended price path.
+        """
+        data['close'] = path
+        return data
 
     def _output_frame_to_dir(self, data):
         """
@@ -127,5 +155,6 @@ class GBM_Simulator:
         frame with some simulated GBM data and saves it to disk as a CSV.
         """
         data = self._create_empty_frame()
-        paths = self._create_geometric_brownian_motion(data)
-        self._output_frame_to_dir(paths)
+        paths = self._create_geometric_brownian_motion(self, data)
+        data = self._append_path_to_data(data, paths)
+        self._output_frame_to_dir(self, data)
