@@ -54,8 +54,8 @@ class GBM_Simulator:
         self.start_date = start_date
         self.end_date = end_date
         self.output_dir = output_dir
-        self.T = T,
-        self.n = n,
+        self.T = T
+        self.n = n
         self.symbol = symbol
         self.init_price = init_price
         self.mu = mu
@@ -113,7 +113,7 @@ class GBM_Simulator:
                 (self.mu - self.sigma**2 / 2) * dt +
                 self.sigma * np.random.normal(0, np.sqrt(dt), size=n)
         )
-        asset_paths.append(self.init_price * asset_path.cumprod())
+            asset_paths.append(self.init_price * asset_path.cumprod())
 
         # Generate the asset price paths
         return np.array(asset_paths)
