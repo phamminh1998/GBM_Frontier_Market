@@ -82,12 +82,11 @@ class GBM_Simulator:
         return pd.DataFrame(
             {
                 'date': date_range,
-                'open': zeros,
-                'close': zeros,
+                'close': zeros
             }
-        )[['date', 'open', 'close']]
+        )
 
-    def _create_geometric_brownian_motion(self, data):
+    def _create_geometric_brownian_motion(self):
         """
         Calculates asset price paths using the analytical solution
         to the Geometric Brownian Motion stochastic differential
@@ -108,15 +107,19 @@ class GBM_Simulator:
         dt = T / n  # Time step
 
         # Vectorised implementation of asset path generation
-        asset_path = np.exp(
-            (self.mu - self.sigma**2 / 2) * dt +
-            self.sigma * np.random.normal(0, np.sqrt(dt), size=n)
+        asset_paths = []
+        for _ in range(self.num_sims):
+            asset_path = np.exp(
+                (self.mu - self.sigma**2 / 2) * dt +
+                self.sigma * np.random.normal(0, np.sqrt(dt), size=n)
         )
+        asset_paths.append(self.init_price * asset_path.cumprod())
 
         # Generate the asset price paths
-        return self.init_price * asset_path.cumprod()
+        return np.array(asset_paths)
+
     
-    def _append_path_to_data(self, data, path):
+    def _append_path_to_data(self, data, paths):
         """
         Append the generated price path to the DataFrame.
 
@@ -132,7 +135,8 @@ class GBM_Simulator:
         `pd.DataFrame`
             The DataFrame containing the appended price path.
         """
-        data['close'] = path
+        for i, path in enumerate(paths):
+            data[f'path_{i+1}'] = path
         return data
 
     def _output_frame_to_dir(self, data):
@@ -155,6 +159,6 @@ class GBM_Simulator:
         frame with some simulated GBM data and saves it to disk as a CSV.
         """
         data = self._create_empty_frame()
-        paths = self._create_geometric_brownian_motion(self, data)
+        paths = self._create_geometric_brownian_motion()
         data = self._append_path_to_data(data, paths)
-        self._output_frame_to_dir(self, data)
+        self._output_frame_to_dir(data)
