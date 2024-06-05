@@ -73,18 +73,8 @@ class GBM_Simulator:
         `pd.DataFrame`
             The empty close price DataFrame for subsequent population.
         """
-        date_range = pd.date_range(
-            self.start_date,
-            self.end_date,
-            freq='B'
-        )
-        zeros = pd.Series(np.zeros(len(date_range)))
-        return pd.DataFrame(
-            {
-                'date': date_range,
-                'close': zeros
-            }
-        )
+        date_range = pd.bdate_range(start=self.start_date, periods=self.n)
+        return pd.DataFrame({'date': date_range})
 
     def _create_geometric_brownian_motion(self):
         """
@@ -135,8 +125,8 @@ class GBM_Simulator:
         `pd.DataFrame`
             The DataFrame containing the appended price path.
         """
-        for i, path in enumerate(paths):
-            data[f'path_{i+1}'] = path
+        for i in range(paths.shape[0]):
+            data[f'path_{i+1}'] = paths[i]
         return data
 
     def _output_frame_to_dir(self, data):
