@@ -1,0 +1,17 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: GBM Application on Frontier Markets
+message: >-
+  Minh Pham's project for Master Thesis. Please cite if
+  refer to my code
+type: software
+authors:
+  - given-names: Minh
+    family-names: Pham
+    email: phamminh1998@gmail.com
+repository-code: 'https://github.com/phamminh1998/GBM_Frontier_Market'
+keywords:
+  - GBM
+  - Frontier Market
