@@ -7,10 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/13poeXxwYkVV3S1cHADj-RXPS3SgpMSJB
 """
 
-# Mount Google Drive
-from google.colab import drive
-drive.mount('/content/drive')
-
 # Import and pre-process 2023 data of DSE
 import os
 import pandas as pd
@@ -94,7 +90,7 @@ dse_df_2023 = pd.concat(DSE_dict_2023.values(), ignore_index=True)
 print(dse_df_2023)
 dse_df_2023.to_csv('/content/drive/My Drive/BISS/EMTH0009 - Master Thesis/Data/dse_df_2023.csv', index=False)
 
-!pip install xlwt
+pip install xlwt
 import os
 import requests
 import pandas as pd
