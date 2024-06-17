@@ -91,6 +91,6 @@ Navigate to the `notebooks` directory and run the Jupyter notebooks as needed.
 
 ## Citation
 This work is data science project under my Master Thesis, please cite as:
-Your Name. (2024). *Using Geometric Brownian Motion to Predict Stock Prices in Frontier Markets* [Computer software]. GitHub. https://github.com/your-username/your-repo-name
+Minh Pham. (2024). *Stock Price Prediction By Geometric Brownian Motion in Frontier Markets* [Computer software]. GitHub. [https://github.com/phamminh1998/GBM_Frontier_Market]
 
 Please cite this work, thank you~
